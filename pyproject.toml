@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "browserget"
-version = "1.0.0"
+version = "1.0.1"
 description = "Standalone CLI to install browsers and drivers without any framework"
 readme = "README.md"
 license = "MIT"

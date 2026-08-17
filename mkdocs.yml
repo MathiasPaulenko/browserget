@@ -44,6 +44,7 @@ nav:
     - Install: usage/install.md
     - Ensure: usage/ensure.md
     - Cache: usage/cache.md
+    - Examples: usage/examples.md
   - CLI Reference:
     - Commands: cli-reference/commands.md
   - Architecture:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -187,6 +188,7 @@ class TestDetectMacOS:
         assert result is None
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="winreg is only available on Windows")
 class TestDetectWindows:
     """Tests for Windows browser detection."""
 
