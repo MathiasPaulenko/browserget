@@ -36,17 +36,29 @@ and checksum URLs based on the version and platform.
 
 ### Edge Updates API
 
-Edge and EdgeDriver versions are resolved from the Microsoft Edge Updates API.
+Edge browser versions are resolved from the Microsoft Edge Updates API.
 
-- **URL**: `https://edgeupdates.microsoft.com/api/v1/edge`
+- **URL**: `https://edgeupdates.microsoft.com/api/products`
 - **Format**: JSON
-- **Structure**: An array of products, each with a `downloads` list containing
-  platform-specific URLs and SHA-256 checksums.
-- **Checksums**: Provided as `Hash` fields (SHA-256) in the download entries.
+- **Structure**: An array of products, each with a `Product` name and a
+  `Releases` list. Each release contains `Platform`, `Architecture`,
+  `ProductVersion`, and an `Artifacts` array. Each artifact has `Location`,
+  `Hash`, and `HashAlgorithm` fields.
+- **Checksums**: Provided as `Hash` and `HashAlgorithm` fields in the artifact
+  entries.
 
-The parser (`parsers/edge.py`) filters by target (edge or edgedriver) and
-platform, using the same internal platform strings as the CfT API
-(e.g. `win64`, `linux64`, `mac-arm64`).
+The parser (`parsers/edge.py`) only supports the `Stable` product and the
+`edge` target. It filters by the mapped `Platform` and `Architecture` and
+returns the first artifact for each matching release.
+
+### EdgeDriver CDN
+
+EdgeDriver is **not** available from the Edge Updates API. It is distributed
+from a separate CDN:
+
+- **Latest version URL**: `https://msedgedriver.microsoft.com/LATEST_STABLE`
+- **Download URL**: `https://msedgedriver.microsoft.com/{version}/edgedriver_{platform}.zip`
+- **Format**: Zip archive, no checksums published.
 
 ### GeckoDriver GitHub releases
 

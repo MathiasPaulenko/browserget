@@ -29,6 +29,37 @@ browserget install chromedriver --for chrome
 browserget doctor
 ```
 
+## Common examples
+
+### Idempotent CI setup
+
+```bash
+pip install browserget
+browserget ensure chrome chromedriver
+CHROME_PATH=$(browserget path chrome)
+```
+
+### Pin a version
+
+```bash
+browserget install chrome --version 131.0.6778.87
+browserget install chromedriver --for chrome
+```
+
+### Manage the cache
+
+```bash
+browserget list
+browserget remove chrome --version 130.0.6723.69
+browserget doctor
+```
+
+### Machine-readable output
+
+```bash
+browserget list --json
+```
+
 ## Features
 
 - **7 commands**: `install`, `ensure`, `list`, `path`, `remove`, `versions`, `doctor`
