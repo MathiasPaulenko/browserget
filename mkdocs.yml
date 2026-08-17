@@ -1,0 +1,51 @@
+site_name: browserget
+site_description: Standalone CLI to install browsers and drivers without any framework
+site_url: https://mathiaspaulenko.github.io/browserget/
+repo_url: https://github.com/MathiasPaulenko/browserget
+repo_name: MathiasPaulenko/browserget
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - code.copy
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Usage:
+    - Install: usage/install.md
+    - Ensure: usage/ensure.md
+    - Cache: usage/cache.md
+  - CLI Reference:
+    - Commands: cli-reference/commands.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Parsers: architecture/parsers.md
