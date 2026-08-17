@@ -1,0 +1,202 @@
+{
+  "timestamp": "2024-11-14T12:00:00.000Z",
+  "versions": [
+    {
+      "version": "131.0.6778.87",
+      "revision": "1234567",
+      "downloads": {
+        "chrome": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.87/win64/chrome-win64.zip",
+            "checksums": {
+              "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+            }
+          },
+          "mac-arm64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.87/mac-arm64/chrome-mac-arm64.zip",
+            "checksums": {
+              "sha256": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3"
+            }
+          },
+          "linux64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.87/linux64/chrome-linux64.zip",
+            "checksums": {
+              "sha256": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+            }
+          }
+        },
+        "chromedriver": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.87/win64/chromedriver-win64.zip",
+            "checksums": {
+              "sha256": "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5"
+            }
+          },
+          "mac-arm64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.87/mac-arm64/chromedriver-mac-arm64.zip",
+            "checksums": {
+              "sha256": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+            }
+          },
+          "linux64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.87/linux64/chromedriver-linux64.zip",
+            "checksums": {
+              "sha256": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1"
+            }
+          }
+        }
+      }
+    },
+    {
+      "version": "131.0.6778.80",
+      "revision": "1234560",
+      "downloads": {
+        "chrome": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.80/win64/chrome-win64.zip",
+            "checksums": {
+              "sha256": "1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b"
+            }
+          },
+          "mac-arm64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.80/mac-arm64/chrome-mac-arm64.zip"
+          },
+          "linux64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.80/linux64/chrome-linux64.zip",
+            "checksums": {
+              "sha256": "2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c"
+            }
+          }
+        },
+        "chromedriver": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.80/win64/chromedriver-win64.zip",
+            "checksums": {
+              "sha256": "3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d"
+            }
+          },
+          "mac-arm64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.80/mac-arm64/chromedriver-mac-arm64.zip"
+          },
+          "linux64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.80/linux64/chromedriver-linux64.zip",
+            "checksums": {
+              "sha256": "4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e"
+            }
+          }
+        }
+      }
+    },
+    {
+      "version": "130.0.6723.116",
+      "revision": "1234500",
+      "downloads": {
+        "chrome": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/win64/chrome-win64.zip",
+            "checksums": {
+              "sha256": "5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f"
+            }
+          },
+          "mac-arm64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/mac-arm64/chrome-mac-arm64.zip",
+            "checksums": {
+              "sha256": "6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a"
+            }
+          },
+          "linux64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/linux64/chrome-linux64.zip",
+            "checksums": {
+              "sha256": "1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b"
+            }
+          }
+        },
+        "chromedriver": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/win64/chromedriver-win64.zip",
+            "checksums": {
+              "sha256": "2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c"
+            }
+          },
+          "mac-arm64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/mac-arm64/chromedriver-mac-arm64.zip",
+            "checksums": {
+              "sha256": "3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d"
+            }
+          },
+          "linux64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/linux64/chromedriver-linux64.zip",
+            "checksums": {
+              "sha256": "4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e"
+            }
+          }
+        }
+      }
+    },
+    {
+      "version": "130.0.6723.69",
+      "revision": "1234400",
+      "downloads": {
+        "chrome": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.69/win64/chrome-win64.zip"
+          },
+          "linux64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.69/linux64/chrome-linux64.zip"
+          }
+        },
+        "chromedriver": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.69/win64/chromedriver-win64.zip"
+          }
+        }
+      }
+    },
+    {
+      "version": "129.0.6668.100",
+      "revision": "1234000",
+      "downloads": {
+        "chrome": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/129.0.6668.100/win64/chrome-win64.zip",
+            "checksums": {
+              "sha256": "aabbccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabb"
+            }
+          },
+          "mac-arm64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/129.0.6668.100/mac-arm64/chrome-mac-arm64.zip",
+            "checksums": {
+              "sha256": "bbccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabbcc"
+            }
+          },
+          "linux64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/129.0.6668.100/linux64/chrome-linux64.zip",
+            "checksums": {
+              "sha256": "ccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabbccdd"
+            }
+          }
+        },
+        "chromedriver": {
+          "win64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/129.0.6668.100/win64/chromedriver-win64.zip",
+            "checksums": {
+              "sha256": "ddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabbccddee"
+            }
+          },
+          "mac-arm64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/129.0.6668.100/mac-arm64/chromedriver-mac-arm64.zip",
+            "checksums": {
+              "sha256": "eeffaabbccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabbccddeeff"
+            }
+          },
+          "linux64": {
+            "url": "https://storage.googleapis.com/chrome-for-testing-public/129.0.6668.100/linux64/chromedriver-linux64.zip",
+            "checksums": {
+              "sha256": "ffaabbccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaabbccddeeffaa"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

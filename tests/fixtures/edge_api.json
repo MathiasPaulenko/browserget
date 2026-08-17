@@ -1,0 +1,152 @@
+[
+  {
+    "Product": "Stable",
+    "Releases": [
+      {
+        "Platform": "Windows",
+        "Architecture": "x64",
+        "ProductVersion": "131.0.2903.86",
+        "Artifacts": [
+          {
+            "ArtifactName": "MicrosoftEdge_X64_131.0.2903.86.msi",
+            "Location": "https://msedge.sf.dl.delivery.mp.microsoft.com/files/1/131.0.2903.86/microsoftedge-stable-x64-131.0.2903.86.msi",
+            "Hash": "aaa111bbb222ccc333ddd444eee555fff666aaa111bbb222ccc333ddd444eee5",
+            "HashAlgorithm": "SHA256",
+            "SizeInBytes": 150000000
+          }
+        ]
+      },
+      {
+        "Platform": "MacOS",
+        "Architecture": "universal",
+        "ProductVersion": "131.0.2903.86",
+        "Artifacts": [
+          {
+            "ArtifactName": "MicrosoftEdge_Stable_131.0.2903.86.pkg",
+            "Location": "https://msedge.sf.dl.delivery.mp.microsoft.com/files/1/131.0.2903.86/microsoftedge-stable-131.0.2903.86.pkg",
+            "Hash": "bbb222ccc333ddd444eee555fff666aaa111bbb222ccc333ddd444eee555fff6",
+            "HashAlgorithm": "SHA256",
+            "SizeInBytes": 180000000
+          }
+        ]
+      },
+      {
+        "Platform": "Linux",
+        "Architecture": "x64",
+        "ProductVersion": "131.0.2903.86",
+        "Artifacts": [
+          {
+            "ArtifactName": "microsoft-edge-stable_131.0.2903.86-1_amd64.deb",
+            "Location": "https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_131.0.2903.86-1_amd64.deb",
+            "Hash": "ccc333ddd444eee555fff666aaa111bbb222ccc333ddd444eee555fff666aaa1",
+            "HashAlgorithm": "SHA256",
+            "SizeInBytes": 120000000
+          }
+        ]
+      },
+      {
+        "Platform": "Windows",
+        "Architecture": "x64",
+        "ProductVersion": "130.0.2849.68",
+        "Artifacts": [
+          {
+            "ArtifactName": "MicrosoftEdge_X64_130.0.2849.68.msi",
+            "Location": "https://msedge.sf.dl.delivery.mp.microsoft.com/files/1/130.0.2849.68/microsoftedge-stable-x64-130.0.2849.68.msi",
+            "Hash": null,
+            "HashAlgorithm": null,
+            "SizeInBytes": 148000000
+          }
+        ]
+      },
+      {
+        "Platform": "MacOS",
+        "Architecture": "universal",
+        "ProductVersion": "130.0.2849.68",
+        "Artifacts": [
+          {
+            "ArtifactName": "MicrosoftEdge_Stable_130.0.2849.68.pkg",
+            "Location": "https://msedge.sf.dl.delivery.mp.microsoft.com/files/1/130.0.2849.68/microsoftedge-stable-130.0.2849.68.pkg",
+            "Hash": null,
+            "HashAlgorithm": null,
+            "SizeInBytes": 178000000
+          }
+        ]
+      },
+      {
+        "Platform": "Linux",
+        "Architecture": "x64",
+        "ProductVersion": "130.0.2849.68",
+        "Artifacts": [
+          {
+            "ArtifactName": "microsoft-edge-stable_130.0.2849.68-1_amd64.deb",
+            "Location": "https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_130.0.2849.68-1_amd64.deb",
+            "Hash": null,
+            "HashAlgorithm": null,
+            "SizeInBytes": 118000000
+          }
+        ]
+      },
+      {
+        "Platform": "Windows",
+        "Architecture": "x64",
+        "ProductVersion": "129.0.2792.89",
+        "Artifacts": [
+          {
+            "ArtifactName": "MicrosoftEdge_X64_129.0.2792.89.msi",
+            "Location": "https://msedge.sf.dl.delivery.mp.microsoft.com/files/1/129.0.2792.89/microsoftedge-stable-x64-129.0.2792.89.msi",
+            "Hash": "222bbb333ccc444ddd555eee666fff111aaa222bbb333ccc444ddd555eee666f",
+            "HashAlgorithm": "SHA256",
+            "SizeInBytes": 145000000
+          }
+        ]
+      },
+      {
+        "Platform": "MacOS",
+        "Architecture": "universal",
+        "ProductVersion": "129.0.2792.89",
+        "Artifacts": [
+          {
+            "ArtifactName": "MicrosoftEdge_Stable_129.0.2792.89.pkg",
+            "Location": "https://msedge.sf.dl.delivery.mp.microsoft.com/files/1/129.0.2792.89/microsoftedge-stable-129.0.2792.89.pkg",
+            "Hash": "333ccc444ddd555eee666fff111aaa222bbb333ccc444ddd555eee666fff111a",
+            "HashAlgorithm": "SHA256",
+            "SizeInBytes": 175000000
+          }
+        ]
+      },
+      {
+        "Platform": "Linux",
+        "Architecture": "x64",
+        "ProductVersion": "129.0.2792.89",
+        "Artifacts": [
+          {
+            "ArtifactName": "microsoft-edge-stable_129.0.2792.89-1_amd64.deb",
+            "Location": "https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_129.0.2792.89-1_amd64.deb",
+            "Hash": "444ddd555eee666fff111aaa222bbb333ccc444ddd555eee666fff111aaa222b",
+            "HashAlgorithm": "SHA256",
+            "SizeInBytes": 115000000
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Product": "Beta",
+    "Releases": [
+      {
+        "Platform": "Windows",
+        "Architecture": "x64",
+        "ProductVersion": "131.0.2903.86",
+        "Artifacts": [
+          {
+            "ArtifactName": "MicrosoftEdge_Beta_X64_131.0.2903.86.msi",
+            "Location": "https://msedge.sf.dl.delivery.mp.microsoft.com/files/1/beta/131.0.2903.86/microsoftedge-beta-x64-131.0.2903.86.msi",
+            "Hash": "beta123",
+            "HashAlgorithm": "SHA256",
+            "SizeInBytes": 150000000
+          }
+        ]
+      }
+    ]
+  }
+]
