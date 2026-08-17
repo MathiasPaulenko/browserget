@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://mathiaspaulenko.github.io/browserget/</loc>
+         <lastmod>2026-08-17</lastmod>
+    </url>
+    <url>
+         <loc>https://mathiaspaulenko.github.io/browserget/architecture/overview/</loc>
+         <lastmod>2026-08-17</lastmod>
+    </url>
+    <url>
+         <loc>https://mathiaspaulenko.github.io/browserget/architecture/parsers/</loc>
+         <lastmod>2026-08-17</lastmod>
+    </url>
+    <url>
+         <loc>https://mathiaspaulenko.github.io/browserget/cli-reference/commands/</loc>
+         <lastmod>2026-08-17</lastmod>
+    </url>
+    <url>
+         <loc>https://mathiaspaulenko.github.io/browserget/usage/cache/</loc>
+         <lastmod>2026-08-17</lastmod>
+    </url>
+    <url>
+         <loc>https://mathiaspaulenko.github.io/browserget/usage/ensure/</loc>
+         <lastmod>2026-08-17</lastmod>
+    </url>
+    <url>
+         <loc>https://mathiaspaulenko.github.io/browserget/usage/examples/</loc>
+         <lastmod>2026-08-17</lastmod>
+    </url>
+    <url>
+         <loc>https://mathiaspaulenko.github.io/browserget/usage/install/</loc>
+         <lastmod>2026-08-17</lastmod>
+    </url>
+</urlset>
