@@ -17,29 +17,77 @@ These options are available on `install` and `ensure` commands:
 
 ### install
 
+Downloads and installs one or more browser or driver binaries.
+
+```bash
+browserget install chrome
+browserget install chrome --version 131.0.6778.87
+browserget install chromedriver --for chrome
+```
+
 ::: browserget.cli.install
 
 ### ensure
+
+Idempotent version of `install`: only downloads if the target is missing.
+
+```bash
+browserget ensure chrome chromedriver
+```
 
 ::: browserget.cli.ensure
 
 ### list
 
+Lists all installed artifacts in the registry.
+
+```bash
+browserget list
+browserget list --json
+```
+
 ::: browserget.cli.list_cmd
 
 ### path
+
+Prints the absolute path to an installed artifact.
+
+```bash
+browserget path chrome
+browserget path chromedriver --version 131.0.6778.87
+```
 
 ::: browserget.cli.path_cmd
 
 ### remove
 
+Removes an installed artifact from the cache and registry.
+
+```bash
+browserget remove chrome
+browserget remove chrome --version 130.0.6723.69
+browserget remove chrome --all
+```
+
 ::: browserget.cli.remove
 
 ### versions
 
+Lists available versions for a target from the upstream API.
+
+```bash
+browserget versions chrome
+```
+
 ::: browserget.cli.versions
 
 ### doctor
+
+Checks cache, disk space, and upstream API reachability.
+
+```bash
+browserget doctor
+```
 
 ::: browserget.cli.doctor
 

@@ -88,6 +88,53 @@ browserget doctor
 browserget install chrome --json
 ```
 
+## Examples
+
+### CI pipeline (idempotent)
+
+```bash
+pip install browserget
+browserget ensure chrome chromedriver
+CHROME_PATH=$(browserget path chrome)
+```
+
+### Install a browser and its matching driver
+
+```bash
+browserget install chrome
+browserget install chromedriver --for chrome
+```
+
+### Pin a specific version
+
+```bash
+browserget install firefox --version 131.0
+browserget install geckodriver --for firefox
+```
+
+### List and clean up
+
+```bash
+browserget list
+browserget remove chrome --version 130.0.6723.69
+browserget doctor
+```
+
+### JSON output
+
+```bash
+browserget list --json
+```
+
+Output:
+
+```json
+[
+  {"name": "chrome", "version": "131.0.6778.87", "path": "/home/user/.browserget/chrome/131.0.6778.87"},
+  {"name": "chromedriver", "version": "131.0.6778.87", "path": "/home/user/.browserget/chromedriver/131.0.6778.87"}
+]
+```
+
 ## Supported targets
 
 | Target | Type | Upstream source |

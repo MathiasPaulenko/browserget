@@ -6,28 +6,32 @@ a single responsibility and can be tested in isolation.
 ## Module diagram
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                      cli.py                              │
-│   Typer app, command parsing, output formatting          │
-└────────────┬────────────────────────┬───────────────────┘
-             │                        │
-     ┌───────▼───────┐       ┌───────▼───────┐
-     │  installers/  │       │   registry.py │
-     │  chrome.py    │       │  (JSON store) │
-     │  firefox.py   │       └───────────────┘
-     │  edge.py      │
-     │  chromedriver │
-     │  geckodriver  │
-     │  edgedriver   │
-     └───┬───┬───┬───┘
-         │   │   │
-  ┌──────▼┐ ┌▼───▼────┐ ┌────────────┐
-  │http.py│ │parsers/ │ │  cache.py  │
-  │(async)│ │ cft.py  │ │  (paths)   │
-  └───────┘ │firefox  │ └────────────┘
-            │edge.py  │
-            │gecko.py │
-            └─────────┘
+┌────────────────────────────────────────────────────────────┐
+│                         cli.py                             │
+│      Typer app, command parsing, output formatting           │
+└────────────┬───────────────────────────┬───────────────────┘
+             │                           │
+     ┌───────▼────────┐        ┌─────────▼──────────┐
+     │  installers/   │        │    registry.py     │
+     │  chrome.py     │        │   (JSON store)     │
+     │  firefox.py    │        └────────────────────┘
+     │  edge.py       │
+     │  chromedriver  │
+     │  geckodriver   │
+     │  edgedriver    │
+     └───┬───┬───┬────┘
+         │   │    │
+  ┌──────▼┐  │  ┌─▼───────┐  ┌─────────────┐
+  │http.py│  │  │parsers/ │  │  cache.py   │
+  │(async)│  │  │ cft.py  │  │   (paths)   │
+  └───────┘  │  │firefox  │  └─────────────┘
+             │  │edge.py  │
+             │  │gecko.py │
+             │  └─────────┘
+        ┌────┴────┐
+        │ system.py │
+        │ platform.py
+        └───────────┘
 ```
 
 ## Install flow
