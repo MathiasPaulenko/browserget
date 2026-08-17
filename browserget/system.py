@@ -117,7 +117,10 @@ class SystemDetector:
         if sys.platform != "win32":
             return None
 
-        import winreg
+        try:
+            import winreg
+        except ModuleNotFoundError:
+            return None
 
         for exe_path_str in _WINDOWS_PATHS.get(name, []):
             exe_path = Path(exe_path_str)

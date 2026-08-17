@@ -36,6 +36,7 @@ Covers:
 from __future__ import annotations
 
 import hashlib
+import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -1290,6 +1291,7 @@ class TestBug55EdgeDriverMacUniversal:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="Edge system detection tests require Windows")
 class TestBug56EdgeForceRemovesOldEntry:
     """Bug 56: Edge installer must remove old registry entry on force reinstall.
 
@@ -1360,6 +1362,7 @@ class TestBug56EdgeForceRemovesOldEntry:
         assert result.version == "131.0.0.0"
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="Edge system detection tests require Windows")
 class TestBug57EdgeForceRemovesAllStaleEntries:
     """Bug 57: Edge installer force=True must remove ALL stale entries.
 
@@ -1549,7 +1552,7 @@ class TestBug59NoPrematureDeletion:
     installation but the registry still pointed to the now-deleted path.
     """
 
-    def test_firefox_install_preserves_dir_on_download_failure(self) -> None:
+    def test_firefox_install_preserves_dir_on_download_failure(self, tmp_path: Path) -> None:
         """Firefox installer must not remove old dir before download."""
         from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -1562,12 +1565,12 @@ class TestBug59NoPrematureDeletion:
         registry.find.return_value = InstalledArtifact(
             name="firefox",
             version="131.0",
-            path=Path("/fake/firefox/131.0"),
+            path=tmp_path / "firefox" / "131.0",
             installed_at=datetime.now(UTC),
             checksum=None,
         )
 
-        config = Config(cache_dir=Path("/fake/cache"))
+        config = Config(cache_dir=tmp_path / "cache")
         http = MagicMock(spec=HttpClient)
         http.download = AsyncMock(side_effect=RuntimeError("download failed"))
         installer = FirefoxInstaller(http, registry, config)
@@ -1587,8 +1590,8 @@ class TestBug59NoPrematureDeletion:
             patch("browserget.installers.firefox.get_download_dir") as mock_download_dir,
             patch("browserget.installers.firefox.safe_download_path") as mock_safe_dl,
         ):
-            mock_download_dir.return_value = Path("/fake/downloads")
-            mock_safe_dl.return_value = Path("/fake/downloads/firefox.exe")
+            mock_download_dir.return_value = tmp_path / "downloads"
+            mock_safe_dl.return_value = tmp_path / "downloads" / "firefox.exe"
 
             import asyncio
 
@@ -1598,7 +1601,7 @@ class TestBug59NoPrematureDeletion:
             # safe_rmtree must NOT be called before the download succeeds
             mock_rmtree.assert_not_called()
 
-    def test_chrome_install_preserves_dir_on_download_failure(self) -> None:
+    def test_chrome_install_preserves_dir_on_download_failure(self, tmp_path: Path) -> None:
         """Chrome installer must not remove old dir before download."""
         from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -1611,12 +1614,12 @@ class TestBug59NoPrematureDeletion:
         registry.find.return_value = InstalledArtifact(
             name="chrome",
             version="131.0.6778.87",
-            path=Path("/fake/chrome/131.0.6778.87"),
+            path=tmp_path / "chrome" / "131.0.6778.87",
             installed_at=datetime.now(UTC),
             checksum=None,
         )
 
-        config = Config(cache_dir=Path("/fake/cache"))
+        config = Config(cache_dir=tmp_path / "cache")
         http = MagicMock(spec=HttpClient)
         http.download = AsyncMock(side_effect=RuntimeError("download failed"))
         installer = ChromeInstaller(http, registry, config)
@@ -1636,8 +1639,8 @@ class TestBug59NoPrematureDeletion:
             patch("browserget.installers.chrome.get_download_dir") as mock_download_dir,
             patch("browserget.installers.chrome.safe_download_path") as mock_safe_dl,
         ):
-            mock_download_dir.return_value = Path("/fake/downloads")
-            mock_safe_dl.return_value = Path("/fake/downloads/chrome.zip")
+            mock_download_dir.return_value = tmp_path / "downloads"
+            mock_safe_dl.return_value = tmp_path / "downloads" / "chrome.zip"
 
             import asyncio
 
@@ -1654,6 +1657,7 @@ class TestBug59NoPrematureDeletion:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="Edge system detection tests require Windows")
 class TestBug60EdgeNoPrematureRegistryCleanup:
     """Tests that the Edge installer does not remove registry entries before
     the installation succeeds when force=True.
