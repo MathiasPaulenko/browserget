@@ -33,8 +33,8 @@ browserget ensure chrome chromedriver
 If both are already installed, the output shows:
 
 ```
-Already installed chrome 131.0.6778.87 -> /home/user/.browserget/chrome/131.0.6778.87
-Already installed chromedriver 131.0.6778.87 -> /home/user/.browserget/chromedriver/131.0.6778.87
+Already installed chrome 131.0.6778.87 -> /home/user/.browserget/chrome/131.0.6778.87/chrome
+Already installed chromedriver 131.0.6778.87 -> /home/user/.browserget/chromedriver/131.0.6778.87/chromedriver
 ```
 
 If they are missing, they are downloaded and installed just like `install`.
@@ -61,7 +61,7 @@ Output when already installed:
 
 ```json
 [
-  {"name": "chrome", "version": "131.0.6778.87", "path": "/home/user/.browserget/chrome/131.0.6778.87", "status": "already_installed"}
+  {"name": "chrome", "version": "131.0.6778.87", "path": "/home/user/.browserget/chrome/131.0.6778.87/chrome", "status": "already_installed"}
 ]
 ```
 
@@ -69,7 +69,7 @@ Output when newly installed:
 
 ```json
 [
-  {"name": "chrome", "version": "131.0.6778.87", "path": "/home/user/.browserget/chrome/131.0.6778.87", "status": "installed"}
+  {"name": "chrome", "version": "131.0.6778.87", "path": "/home/user/.browserget/chrome/131.0.6778.87/chrome", "status": "installed"}
 ]
 ```
 

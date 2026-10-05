@@ -85,7 +85,7 @@ The registry is a single JSON file at `{cache_dir}/registry.json`:
     {
       "name": "chrome",
       "version": "131.0.6778.87",
-      "path": "/home/user/.browserget/chrome/131.0.6778.87",
+      "path": "/home/user/.browserget/chrome/131.0.6778.87/chrome",
       "installed_at": "2026-08-15T07:43:00+00:00",
       "checksum": "abc123..."
     }

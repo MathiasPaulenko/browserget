@@ -68,7 +68,7 @@ mapping artifact names to lists of installed versions:
     {
       "name": "chrome",
       "version": "131.0.6778.87",
-      "path": "/home/user/.browserget/chrome/131.0.6778.87",
+      "path": "/home/user/.browserget/chrome/131.0.6778.87/chrome",
       "installed_at": "2026-08-15T07:43:00+00:00",
       "checksum": "abc123..."
     }
@@ -77,7 +77,7 @@ mapping artifact names to lists of installed versions:
     {
       "name": "chromedriver",
       "version": "131.0.6778.87",
-      "path": "/home/user/.browserget/chromedriver/131.0.6778.87",
+      "path": "/home/user/.browserget/chromedriver/131.0.6778.87/chromedriver",
       "installed_at": "2026-08-15T07:43:30+00:00",
       "checksum": "def456..."
     }

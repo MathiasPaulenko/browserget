@@ -130,8 +130,8 @@ Output:
 
 ```json
 [
-  {"name": "chrome", "version": "131.0.6778.87", "path": "/home/user/.browserget/chrome/131.0.6778.87"},
-  {"name": "chromedriver", "version": "131.0.6778.87", "path": "/home/user/.browserget/chromedriver/131.0.6778.87"}
+  {"name": "chrome", "version": "131.0.6778.87", "path": "/home/user/.browserget/chrome/131.0.6778.87/chrome"},
+  {"name": "chromedriver", "version": "131.0.6778.87", "path": "/home/user/.browserget/chromedriver/131.0.6778.87/chromedriver"}
 ]
 ```
 
@@ -144,7 +144,7 @@ Output:
 | `edge` | Browser | Edge Updates API |
 | `chromedriver` | Driver | Chrome for Testing API |
 | `geckodriver` | Driver | GitHub Releases (mozilla/geckodriver) |
-| `edgedriver` | Driver | Edge Updates API |
+| `edgedriver` | Driver | EdgeDriver CDN |
 
 ## Requirements
 

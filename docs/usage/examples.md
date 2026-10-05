@@ -71,8 +71,8 @@ Example output:
 
 ```json
 [
-  {"name": "chrome", "version": "131.0.6778.87", "path": "/home/user/.browserget/chrome/131.0.6778.87", "status": "already_installed"},
-  {"name": "chromedriver", "version": "131.0.6778.87", "path": "/home/user/.browserget/chromedriver/131.0.6778.87", "status": "already_installed"}
+  {"name": "chrome", "version": "131.0.6778.87", "path": "/home/user/.browserget/chrome/131.0.6778.87/chrome", "status": "already_installed"},
+  {"name": "chromedriver", "version": "131.0.6778.87", "path": "/home/user/.browserget/chromedriver/131.0.6778.87/chromedriver", "status": "already_installed"}
 ]
 ```
 
