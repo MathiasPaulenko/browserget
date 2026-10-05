@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-05
+
+### Fixed
+
+- Chrome and ChromeDriver resolution logic now correctly downloads Stable versions by default, instead of Canary (using `last-known-good-versions-with-downloads.json`)
+- Chrome for Testing (CfT) parser updated to handle the API's current list-based response structure
+- `browserget doctor` crash on Windows due to UnicodeEncodeError when printing checkmark symbols in non-UTF-8 consoles
+- HTTP client decoding bug for EdgeDriver CDN API which returns UTF-16 payloads, causing false unreachable states
+- Windows system browser detection now correctly falls back to `HKEY_CURRENT_USER` for per-user installed browsers
+- Integration test `_find_executable` logic adjusted to correctly resolve binary paths directly
+
+### Changed
+
+- Updated project documentation (README, mkdocs) to match latest API behaviors and output file structures
+
 ## [1.0.1] - 2026-08-17
 
 ### Fixed
