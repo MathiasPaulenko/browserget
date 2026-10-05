@@ -180,21 +180,17 @@ class SystemDetector:
             Version string, or ``None`` if extraction fails.
         """
         for reg_path in _WINDOWS_REG_PATHS.get(name, []):
-            try:
-                with winreg.OpenKey(  # type: ignore[attr-defined]
-                    winreg.HKEY_LOCAL_MACHINE,  # type: ignore[attr-defined]
-                    reg_path,
-                ) as key:
-                    for value_name in ("version", "CurrentVersion"):
-                        try:
-                            version, _ = winreg.QueryValueEx(  # type: ignore[attr-defined]
-                                key, value_name
-                            )
-                            return str(version)
-                        except OSError:
-                            continue
-            except OSError:
-                continue
+            for hkey in (winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE):  # type: ignore[attr-defined]
+                try:
+                    with winreg.OpenKey(hkey, reg_path) as key:  # type: ignore[attr-defined]
+                        for value_name in ("version", "CurrentVersion"):
+                            try:
+                                version, _ = winreg.QueryValueEx(key, value_name)  # type: ignore[attr-defined]
+                                return str(version)
+                            except OSError:
+                                continue
+                except OSError:
+                    continue
         return self._run_version_command(exe_path)
 
     def _get_version_macos(self, app_path: Path) -> str | None:
