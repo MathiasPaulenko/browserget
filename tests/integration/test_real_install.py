@@ -56,7 +56,9 @@ def _run_binary(binary_path: Path, timeout: int = 30) -> str:
 
 
 def _find_executable(artifact_path: Path, name: str) -> Path:
-    """Find the actual executable inside an installed artifact directory or return it if it is already the executable.
+    """Find the actual executable inside an installed artifact directory.
+
+    If the artifact path is already an executable, it is returned directly.
 
     Args:
         artifact_path: The artifact directory or executable path.

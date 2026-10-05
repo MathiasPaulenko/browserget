@@ -41,9 +41,7 @@ CFT_URL = (
     "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
 )
 
-CFT_LATEST_URL = (
-    "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json"
-)
+CFT_LATEST_URL = "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json"
 
 _CHROME_SIZE_MB = 200
 
@@ -78,7 +76,14 @@ class ChromeInstaller(AbstractBrowserInstaller):
                 data = await self._http.get_json(CFT_LATEST_URL)
                 stable_data = data["channels"]["Stable"]
                 target_downloads = stable_data["downloads"]["chrome"]
-                platform_entry = next((d for d in target_downloads if isinstance(d, dict) and d.get("platform") == platform_str), None)
+                platform_entry = next(
+                    (
+                        d
+                        for d in target_downloads
+                        if isinstance(d, dict) and d.get("platform") == platform_str
+                    ),
+                    None,
+                )
                 if platform_entry:
                     checksum = None
                     alg = None

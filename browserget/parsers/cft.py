@@ -40,13 +40,13 @@ def parse_versions(
         target_downloads = downloads.get(target)
         if not isinstance(target_downloads, list):
             continue
-        
+
         platform_entry = None
         for entry_dl in target_downloads:
             if isinstance(entry_dl, dict) and entry_dl.get("platform") == platform:
                 platform_entry = entry_dl
                 break
-        
+
         if not isinstance(platform_entry, dict):
             continue
 
