@@ -229,9 +229,11 @@ class HttpClient:
         with urllib.request.urlopen(req, timeout=self.timeout) as resp:
             data: bytes = resp.read()
             try:
+                if data.startswith(b"\xff\xfe") or data.startswith(b"\xfe\xff"):
+                    return data.decode("utf-16")
                 return data.decode("utf-8")
             except UnicodeDecodeError as exc:
-                raise NetworkError(url=url, reason="Response is not valid UTF-8") from exc
+                raise NetworkError(url=url, reason="Response is not valid text") from exc
 
     def _download_sync(self, url: str, dest: Path) -> None:
         """Synchronous streaming download to a file.

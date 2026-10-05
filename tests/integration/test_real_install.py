@@ -56,10 +56,10 @@ def _run_binary(binary_path: Path, timeout: int = 30) -> str:
 
 
 def _find_executable(artifact_path: Path, name: str) -> Path:
-    """Find the actual executable inside an installed artifact directory.
+    """Find the actual executable inside an installed artifact directory or return it if it is already the executable.
 
     Args:
-        artifact_path: The artifact directory (e.g. cache/chrome/131.0.6778.87/).
+        artifact_path: The artifact directory or executable path.
         name: Artifact name (e.g. "chrome", "chromedriver").
 
     Returns:
@@ -68,6 +68,9 @@ def _find_executable(artifact_path: Path, name: str) -> Path:
     Raises:
         FileNotFoundError: If no executable is found.
     """
+    if artifact_path.is_file():
+        return artifact_path
+
     if sys.platform == "win32":
         candidates = list(artifact_path.rglob(f"{name}.exe"))
     else:

@@ -83,9 +83,7 @@ string expected by each upstream API:
 | Internal platform | CfT | Firefox FTP | Edge API | GeckoDriver |
 |-------------------|-----|-------------|----------|-------------|
 | `win64` | `win64` | `win64/` | `win64` | `win64.zip` |
-| `win32` | `win32` | `win32/` | `win64` | `win32.zip` |
 | `linux64` | `linux64` | `linux-x86_64/` | `linux64` | `linux64.tar.gz` |
-| `linux-arm64` | `linux64` | `linux-aarch64/` | `linux64` | `linux-aarch64.tar.gz` |
 | `mac-arm64` | `mac-arm64` | `mac/` | `mac-arm64` | `macos-aarch64.tar.gz` |
 | `mac-x64` | `mac-x64` | `mac/` | `mac-x64` | `macos.tar.gz` |
 

@@ -41,6 +41,10 @@ CFT_URL = (
     "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
 )
 
+CFT_LATEST_URL = (
+    "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json"
+)
+
 _CHROME_SIZE_MB = 200
 
 
@@ -68,6 +72,29 @@ class ChromeInstaller(AbstractBrowserInstaller):
         """
         platform = detect_platform()
         platform_str = map_platform(platform, "cft")
+
+        if version is None:
+            try:
+                data = await self._http.get_json(CFT_LATEST_URL)
+                stable_data = data["channels"]["Stable"]
+                target_downloads = stable_data["downloads"]["chrome"]
+                platform_entry = next((d for d in target_downloads if isinstance(d, dict) and d.get("platform") == platform_str), None)
+                if platform_entry:
+                    checksum = None
+                    alg = None
+                    if "checksums" in platform_entry and "sha256" in platform_entry["checksums"]:
+                        checksum = platform_entry["checksums"]["sha256"]
+                        alg = "sha256"
+                    return ResolvedVersion(
+                        name="chrome",
+                        version=stable_data["version"],
+                        url=platform_entry["url"],
+                        platform=platform_str,
+                        checksum=checksum,
+                        checksum_algorithm=alg,
+                    )
+            except Exception as e:
+                logger.debug("Failed to resolve latest stable from %s: %s", CFT_LATEST_URL, e)
 
         data = await self._http.get_json(CFT_URL)
         versions = parse_versions(data, "chrome", platform_str)

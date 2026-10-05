@@ -470,12 +470,12 @@ class TestFetchTextEncodingError:
                 pass
 
             def read(self) -> bytes:
-                # Invalid UTF-8 byte sequence
-                return b"\xff\xfe\x00invalid"
+                # Invalid text byte sequence (not valid UTF-8 and no valid UTF-16 BOM)
+                return b"\xff\xff\xff\xff"
 
         with (
             patch("urllib.request.urlopen", return_value=FakeResponse()),
-            pytest.raises(NetworkError, match="not valid UTF-8"),
+            pytest.raises(NetworkError, match="not valid text"),
         ):
             client._fetch_text_sync("http://example.com/test")
 

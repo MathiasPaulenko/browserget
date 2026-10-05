@@ -789,8 +789,15 @@ def doctor() -> None:
         ]
     checks.extend(connectivity)
 
+    try:
+        ok_sym, fail_sym = "\u2713", "\u2717"
+        if sys.platform == "win32" and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
+            ok_sym, fail_sym = "OK", "X"
+    except Exception:
+        ok_sym, fail_sym = "OK", "X"
+
     for name, ok, detail in checks:
-        symbol = "\u2713" if ok else "\u2717"
+        symbol = ok_sym if ok else fail_sym
         print(f"  {symbol} {name}: {detail}")
 
 
