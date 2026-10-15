@@ -1,0 +1,32 @@
+name: browserget
+description: Install browsers and drivers without a framework — chrome, chromedriver, firefox and more.
+author: MathiasPaulenko
+branding:
+  icon: download
+  color: blue
+
+inputs:
+  tools:
+    description: Space-separated tools to install (e.g. "chrome chromedriver", "firefox geckodriver")
+    required: false
+    default: "chrome chromedriver"
+  verify:
+    description: Run `browserget doctor` after install to verify
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Install browserget
+      shell: bash
+      run: pip install browserget
+
+    - name: Install browsers/drivers
+      shell: bash
+      run: browserget ensure ${{ inputs.tools }}
+
+    - name: Verify installation
+      if: inputs.verify == 'true'
+      shell: bash
+      run: browserget doctor
