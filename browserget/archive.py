@@ -7,6 +7,7 @@ path-traversal attacks.
 
 from __future__ import annotations
 
+import contextlib
 import os
 import stat
 import sys
@@ -53,13 +54,24 @@ def extract_zip(archive_path: Path, dest: Path) -> None:
     """
     dest.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(archive_path, "r") as zf:
+        extracted_modes: list[tuple[Path, int]] = []
         for member in zf.infolist():
-            _safe_extract_path(dest, member.filename)
+            target = _safe_extract_path(dest, member.filename)
             unix_mode = member.external_attr >> 16
             if stat.S_ISLNK(unix_mode):
                 link_target = zf.read(member).decode("utf-8", errors="replace")
                 _safe_extract_path(dest, link_target)
+            elif member.filename.endswith("/"):
+                continue
+            elif unix_mode and stat.S_ISREG(unix_mode):
+                extracted_modes.append((target, stat.S_IMODE(unix_mode) & 0o777))
         zf.extractall(dest)
+        # ZipInfo stores POSIX permissions in the high bits of external_attr;
+        # extractall() drops them, which leaves helper binaries non-executable.
+        if os.name != "nt":
+            for target, mode in extracted_modes:
+                with contextlib.suppress(OSError):
+                    os.chmod(target, mode)
 
 
 def extract_tar(archive_path: Path, dest: Path) -> None:

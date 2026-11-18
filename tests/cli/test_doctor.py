@@ -13,13 +13,12 @@ from browserget.cli import app
 class TestDoctor:
     """Doctor command tests."""
 
-    def test_doctor_clean_state(self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_doctor_clean_state(
+        self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
         """doctor (clean state) → all checks pass, exit 0."""
         from browserget import cli as cli_module
 
-        tmp_path = MagicMock()
-        tmp_path.exists = MagicMock(return_value=True)
-        tmp_path.is_dir = MagicMock(return_value=True)
         monkeypatch.setattr(cli_module, "load_config", lambda: MagicMock(cache_dir=tmp_path))
 
         monkeypatch.setattr(cli_module, "get_cache_size", lambda: 1024 * 1024 * 50)
@@ -54,14 +53,16 @@ class TestDoctor:
         assert "\u2713" in result.stdout
 
     def test_doctor_cache_dir_missing(
-        self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch
+        self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch, tmp_path
     ) -> None:
         """doctor (cache dir missing) → ✗ for cache check, exit 0."""
         from browserget import cli as cli_module
 
-        tmp_path = MagicMock()
-        tmp_path.exists = MagicMock(return_value=False)
-        monkeypatch.setattr(cli_module, "load_config", lambda: MagicMock(cache_dir=tmp_path))
+        monkeypatch.setattr(
+            cli_module,
+            "load_config",
+            lambda: MagicMock(cache_dir=tmp_path / "missing"),
+        )
 
         monkeypatch.setattr(cli_module, "get_cache_size", lambda: 0)
         monkeypatch.setattr(
@@ -94,14 +95,11 @@ class TestDoctor:
         assert "Cache directory" in result.stdout
 
     def test_doctor_no_system_browsers(
-        self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch
+        self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch, tmp_path
     ) -> None:
         """doctor (no system browsers) → ✗ for browser checks, exit 0."""
         from browserget import cli as cli_module
 
-        tmp_path = MagicMock()
-        tmp_path.exists = MagicMock(return_value=True)
-        tmp_path.is_dir = MagicMock(return_value=True)
         monkeypatch.setattr(cli_module, "load_config", lambda: MagicMock(cache_dir=tmp_path))
 
         monkeypatch.setattr(cli_module, "get_cache_size", lambda: 0)
@@ -134,13 +132,12 @@ class TestDoctor:
         assert "\u2717" in result.stdout
         assert "System browsers" in result.stdout
 
-    def test_doctor_network_down(self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_doctor_network_down(
+        self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
         """doctor (network down) → ✗ for connectivity, exit 0."""
         from browserget import cli as cli_module
 
-        tmp_path = MagicMock()
-        tmp_path.exists = MagicMock(return_value=True)
-        tmp_path.is_dir = MagicMock(return_value=True)
         monkeypatch.setattr(cli_module, "load_config", lambda: MagicMock(cache_dir=tmp_path))
 
         monkeypatch.setattr(cli_module, "get_cache_size", lambda: 0)
@@ -174,13 +171,17 @@ class TestDoctor:
         assert result.exit_code == 0
         assert "\u2717" in result.stdout
 
-    def test_doctor_always_exit_0(self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_doctor_always_exit_0(
+        self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
         """doctor with partial failures → still exit 0."""
         from browserget import cli as cli_module
 
-        tmp_path = MagicMock()
-        tmp_path.exists = MagicMock(return_value=False)
-        monkeypatch.setattr(cli_module, "load_config", lambda: MagicMock(cache_dir=tmp_path))
+        monkeypatch.setattr(
+            cli_module,
+            "load_config",
+            lambda: MagicMock(cache_dir=tmp_path / "missing"),
+        )
 
         monkeypatch.setattr(cli_module, "get_cache_size", lambda: 0)
         monkeypatch.setattr(

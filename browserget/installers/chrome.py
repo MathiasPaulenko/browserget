@@ -167,18 +167,22 @@ class ChromeInstaller(AbstractBrowserInstaller):
                 safe_rmtree(artifact_dir)
             artifact_dir.mkdir(parents=True, exist_ok=True)
 
-            logger.info("Extracting...")
-            await asyncio.to_thread(extract_zip, archive_path, artifact_dir)
+            try:
+                logger.info("Extracting...")
+                await asyncio.to_thread(extract_zip, archive_path, artifact_dir)
 
-            binary_path = self._find_binary(artifact_dir)
-            if binary_path is None:
-                raise RuntimeError(
-                    f"Chrome binary not found in extracted archive at {artifact_dir}"
-                )
+                binary_path = self._find_binary(artifact_dir)
+                if binary_path is None:
+                    raise RuntimeError(
+                        f"Chrome binary not found in extracted archive at {artifact_dir}"
+                    )
 
-            if os.name != "nt":
-                current = binary_path.stat().st_mode
-                binary_path.chmod(current | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+                if os.name != "nt":
+                    current = binary_path.stat().st_mode
+                    binary_path.chmod(current | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+            except BaseException:
+                safe_rmtree(artifact_dir)
+                raise
 
             installed = InstalledArtifact(
                 name=self.name,

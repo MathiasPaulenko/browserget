@@ -79,7 +79,7 @@ def load_config() -> Config:
     Returns:
         A ``Config`` instance populated from env vars or defaults.
     """
-    cache_dir_str = os.environ.get("BROWSERGET_CACHE_DIR")
+    cache_dir_str = os.environ.get("BROWSERGET_CACHE_DIR", "").strip()
     cache_dir = Path(cache_dir_str) if cache_dir_str else _default_cache_dir()
 
     timeout = _parse_int(os.environ.get("BROWSERGET_TIMEOUT", ""), 30)

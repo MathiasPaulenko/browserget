@@ -19,7 +19,22 @@ logger = logging.getLogger(__name__)
 
 _RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 _CHUNK_SIZE = 8192
-_USER_AGENT = "browserget/1.0"
+_MAX_TEXT_BYTES = 64 * 1024 * 1024
+_MAX_BACKOFF_DELAY = 60.0
+_ALLOWED_SCHEMES = {"http", "https"}
+
+
+def _default_user_agent() -> str:
+    """Build the User-Agent string from the installed package version."""
+    try:
+        from importlib.metadata import version
+
+        return f"browserget/{version('browserget')}"
+    except Exception:  # noqa: BLE001
+        return "browserget/0.0.0"
+
+
+_USER_AGENT = _default_user_agent()
 
 
 class HttpClient:
@@ -31,6 +46,10 @@ class HttpClient:
     """
 
     def __init__(self, timeout: int = 30, max_retries: int = 3) -> None:
+        if timeout < 1:
+            raise ValueError(f"timeout must be >= 1, got {timeout}")
+        if max_retries < 0:
+            raise ValueError(f"max_retries must be >= 0, got {max_retries}")
         self.timeout = timeout
         self.max_retries = max_retries
 
@@ -207,6 +226,8 @@ class HttpClient:
             The URL with the path component percent-encoded.
         """
         parts = urllib.parse.urlsplit(url)
+        if parts.scheme.lower() not in _ALLOWED_SCHEMES:
+            raise NetworkError(url=url, reason=f"Unsupported URL scheme: {parts.scheme!r}")
         encoded_path = urllib.parse.quote(parts.path, safe="/%")
         return urllib.parse.urlunsplit(
             (parts.scheme, parts.netloc, encoded_path, parts.query, parts.fragment)
@@ -227,8 +248,12 @@ class HttpClient:
         encoded_url = self._encode_url(url)
         req = urllib.request.Request(encoded_url, headers={"User-Agent": _USER_AGENT})
         with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-            data: bytes = resp.read()
+            data: bytes = resp.read(_MAX_TEXT_BYTES + 1)
+            if len(data) > _MAX_TEXT_BYTES:
+                raise NetworkError(url=url, reason="Response body too large")
             try:
+                if data.startswith(b"\xff\xfe\x00\x00") or data.startswith(b"\x00\x00\xfe\xff"):
+                    return data.decode("utf-32")
                 if data.startswith(b"\xff\xfe") or data.startswith(b"\xfe\xff"):
                     return data.decode("utf-16")
                 return data.decode("utf-8")
@@ -268,7 +293,7 @@ class HttpClient:
             retry_after = exc.headers.get("Retry-After")
             if retry_after is not None:
                 try:
-                    return float(retry_after)
+                    return min(max(float(retry_after), 0.0), _MAX_BACKOFF_DELAY)
                 except ValueError:
                     pass
-        return float(2 ** (attempt - 1))
+        return min(float(2 ** (attempt - 1)), _MAX_BACKOFF_DELAY)

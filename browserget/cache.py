@@ -24,13 +24,27 @@ def get_cache_dir() -> Path:
     return cache_dir
 
 
+# Characters and device names that are invalid in Windows file names. Versions
+# and target names flow into filesystem paths, so blocking them keeps the cache
+# usable on Windows regardless of where the upstream strings come from.
+_INVALID_PATH_CHARS = set('<>:"|?*')
+_RESERVED_DEVICE_NAMES = {
+    "con",
+    "prn",
+    "aux",
+    "nul",
+    *{f"com{i}" for i in range(1, 10)},
+    *{f"lpt{i}" for i in range(1, 10)},
+}
+
+
 def _validate_path_component(component: str) -> str:
     """Validate that a string is safe to use as a single path component.
 
     Rejects empty strings, strings containing path separators (``/`` or ``\\``),
-    and the ``..`` traversal sequence.  This prevents path-traversal attacks
-    when version strings or names from upstream APIs are used to construct
-    filesystem paths.
+    the ``..`` traversal sequence, characters illegal in Windows file names
+    (``<>:\"|?*``, control characters), reserved device names (``NUL``, ``CON``,
+    ``COM1``-``COM9``, ``LPT1``-``LPT9``) and trailing dots or spaces.
 
     Args:
         component: The string to validate.
@@ -39,7 +53,7 @@ def _validate_path_component(component: str) -> str:
         The validated string.
 
     Raises:
-        ValueError: If the component contains path separators or ``..``.
+        ValueError: If the component is unsafe as a path segment.
     """
     if not component or component == ".." or component == ".":
         raise ValueError(f"Unsafe path component: {component!r}")
@@ -50,6 +64,12 @@ def _validate_path_component(component: str) -> str:
     # Reject any component that resolves to a parent path
     if Path(component).parts != (component,):
         raise ValueError(f"Path component is not a single segment: {component!r}")
+    if any(c in _INVALID_PATH_CHARS or ord(c) < 32 for c in component):
+        raise ValueError(f"Path component contains invalid character: {component!r}")
+    if component != component.rstrip(" ."):
+        raise ValueError(f"Path component has trailing dot or space: {component!r}")
+    if component.split(".")[0].lower() in _RESERVED_DEVICE_NAMES:
+        raise ValueError(f"Path component is a reserved device name: {component!r}")
     return component
 
 
@@ -109,6 +129,11 @@ def cleanup_downloads() -> None:
     if download_dir.is_symlink():
         download_dir.unlink()
         return
+    # A regular file (or other non-directory) at the downloads path is a
+    # leftover obstacle; remove it so later downloads can recreate the dir.
+    if download_dir.exists() and not download_dir.is_dir():
+        download_dir.unlink()
+        return
     if not download_dir.exists():
         return
     for item in download_dir.iterdir():
@@ -129,11 +154,14 @@ def safe_rmtree(path: Path) -> None:
     If *path* is a symlink, the symlink itself is unlinked rather than
     recursing into its target. This prevents accidental deletion of
     files outside the cache when ``path`` points elsewhere via a symlink.
+    Regular files at ``path`` are unlinked directly. Missing paths still
+    raise ``OSError`` (delegated to ``shutil.rmtree``); callers are expected
+    to check ``exists()`` first, as they do today.
 
     Args:
         path: Directory path to remove.
     """
-    if path.is_symlink():
+    if path.is_symlink() or path.is_file():
         path.unlink()
         return
     shutil.rmtree(path)

@@ -2,16 +2,49 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import os
+import sys
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from browserget.exceptions import VersionNotFoundError
 from browserget.models import InstalledArtifact
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 logger = logging.getLogger(__name__)
+
+
+def _lock_file(lock_fd: int) -> None:
+    """Acquire an exclusive lock on the open file descriptor."""
+    if sys.platform == "win32":
+        import msvcrt
+
+        # msvcrt.locking locks bytes from the current position; normalize to 0.
+        os.lseek(lock_fd, 0, os.SEEK_SET)
+        msvcrt.locking(lock_fd, msvcrt.LK_LOCK, 1)
+    else:
+        import fcntl
+
+        fcntl.flock(lock_fd, fcntl.LOCK_EX)
+
+
+def _unlock_file(lock_fd: int) -> None:
+    """Release the lock acquired by :func:`_lock_file`."""
+    if sys.platform == "win32":
+        import msvcrt
+
+        os.lseek(lock_fd, 0, os.SEEK_SET)
+        msvcrt.locking(lock_fd, msvcrt.LK_UNLCK, 1)
+    else:
+        import fcntl
+
+        fcntl.flock(lock_fd, fcntl.LOCK_UN)
 
 
 class Registry:
@@ -78,6 +111,10 @@ class Registry:
             data: The registry data to write.
         """
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+        # Remove temp files left behind by interrupted previous writes.
+        for stale in self.cache_dir.glob("tmp*.tmp"):
+            with contextlib.suppress(OSError):
+                stale.unlink()
         serializable: dict[str, list[dict[str, str | None]]] = {
             name: [a.to_dict() for a in artifacts] for name, artifacts in data.items()
         }
@@ -98,6 +135,23 @@ class Registry:
                 tmp_path.unlink(missing_ok=True)
             raise
 
+    @contextlib.contextmanager
+    def _locked(self) -> Iterator[None]:
+        """Hold an exclusive inter-process lock on the registry lock file.
+
+        Serializes the read-modify-write cycle in :meth:`add` and
+        :meth:`remove` so concurrent CLI invocations don't lose updates.
+        """
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        lock_path = self.cache_dir / ".registry.lock"
+        with open(lock_path, "a+b") as lock_file:
+            _lock_file(lock_file.fileno())
+            try:
+                yield
+            finally:
+                with contextlib.suppress(OSError):
+                    _unlock_file(lock_file.fileno())
+
     def add(self, artifact: InstalledArtifact) -> None:
         """Add or replace an artifact in the registry.
 
@@ -107,14 +161,17 @@ class Registry:
         Args:
             artifact: The artifact to add or update.
         """
-        data = self.load()
-        entries = data.get(artifact.name, [])
-        entries = [
-            e for e in entries if not (e.name == artifact.name and e.version == artifact.version)
-        ]
-        entries.append(artifact)
-        data[artifact.name] = entries
-        self.save(data)
+        with self._locked():
+            data = self.load()
+            entries = data.get(artifact.name, [])
+            entries = [
+                e
+                for e in entries
+                if not (e.name == artifact.name and e.version == artifact.version)
+            ]
+            entries.append(artifact)
+            data[artifact.name] = entries
+            self.save(data)
 
     def remove(self, name: str, version: str) -> None:
         """Remove an artifact from the registry.
@@ -127,20 +184,21 @@ class Registry:
             VersionNotFoundError: If no artifact with the given name and
                 version exists in the registry.
         """
-        data = self.load()
-        entries = data.get(name, [])
-        filtered = [e for e in entries if e.version != version]
-        if len(filtered) == len(entries):
-            raise VersionNotFoundError(
-                version=version,
-                name=name,
-                top_3_versions=", ".join(e.version for e in entries[:3]) or "none",
-            )
-        if filtered:
-            data[name] = filtered
-        else:
-            data.pop(name, None)
-        self.save(data)
+        with self._locked():
+            data = self.load()
+            entries = data.get(name, [])
+            filtered = [e for e in entries if e.version != version]
+            if len(filtered) == len(entries):
+                raise VersionNotFoundError(
+                    version=version,
+                    name=name,
+                    top_3_versions=", ".join(e.version for e in entries[:3]) or "none",
+                )
+            if filtered:
+                data[name] = filtered
+            else:
+                data.pop(name, None)
+            self.save(data)
 
     def get(self, name: str) -> list[InstalledArtifact]:
         """Return all installed versions of a target.

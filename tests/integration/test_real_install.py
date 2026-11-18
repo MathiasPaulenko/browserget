@@ -436,7 +436,7 @@ class TestRealInstallEdgeCases:
         assert "Available versions" in result.output
         # Should have at least one version number in output
         lines = result.output.strip().split("\n")
-        version_lines = [line for line in lines if line.strip().startswith("  ")]
+        version_lines = [line for line in lines if line.strip()[:1].isdigit()]
         assert len(version_lines) > 0, "no versions listed"
 
     def test_versions_chrome_json_real(
@@ -447,7 +447,8 @@ class TestRealInstallEdgeCases:
         """versions chrome --json returns valid JSON array from real API."""
         result = runner.invoke(app, ["versions", "chrome", "--json"])
         assert result.exit_code == 0, f"versions --json failed: {result.output}"
-        data = json.loads(result.output)
+        # INFO logs go to stderr but CliRunner mixes streams into .output.
+        data = json.loads(result.output[result.output.index("[") :])
         assert isinstance(data, list)
         assert len(data) > 0
         assert all(isinstance(v, str) for v in data)

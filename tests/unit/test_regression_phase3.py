@@ -228,7 +228,10 @@ class TestCliNonBrowsergetErrorHandling:
             raise RuntimeError("Unexpected error")
 
         monkeypatch.setattr("browserget.cli._run_async", fake_run_async)
-        monkeypatch.setattr("browserget.cli.load_config", lambda: MagicMock(cache_dir=tmp_path))
+        monkeypatch.setattr(
+            "browserget.cli.load_config",
+            lambda: MagicMock(cache_dir=tmp_path, timeout=30, max_retries=3),
+        )
         monkeypatch.setattr("browserget.cli.setup_logging", lambda **kw: None)
         # Mock _fetch_available_versions to avoid creating a real coroutine
         monkeypatch.setattr("browserget.cli._fetch_available_versions", MagicMock(return_value=[]))
@@ -469,7 +472,7 @@ class TestFetchTextEncodingError:
             def __exit__(self, *args: object) -> None:
                 pass
 
-            def read(self) -> bytes:
+            def read(self, size: int = -1) -> bytes:
                 # Invalid text byte sequence (not valid UTF-8 and no valid UTF-16 BOM)
                 return b"\xff\xff\xff\xff"
 

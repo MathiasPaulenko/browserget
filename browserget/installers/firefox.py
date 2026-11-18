@@ -82,9 +82,12 @@ class FirefoxInstaller(AbstractBrowserInstaller):
             target_version = find_latest(versions)
         elif version in versions:
             target_version = version
-        else:
+        elif not version.lower().endswith("esr"):
+            # A bare version (e.g. "128.0") may match its ESR build; an
+            # explicit "Xesr" request must never resolve to a non-ESR build.
+            normalized = version.lower()
             for v in versions:
-                if v.lower().removesuffix("esr") == version.lower().removesuffix("esr"):
+                if v.lower().removesuffix("esr") == normalized:
                     target_version = v
                     break
 
@@ -167,25 +170,31 @@ class FirefoxInstaller(AbstractBrowserInstaller):
                 safe_rmtree(artifact_dir)
             artifact_dir.mkdir(parents=True, exist_ok=True)
 
-            logger.info("Extracting...")
-            if archive_path.suffix == ".exe":
-                await asyncio.to_thread(self._extract_exe, archive_path, artifact_dir)
-            elif archive_path.suffix == ".dmg":
-                await asyncio.to_thread(self._extract_dmg, archive_path, artifact_dir)
-            elif ".tar" in archive_path.name:
-                await asyncio.to_thread(extract_tar, archive_path, artifact_dir)
-            else:
-                await asyncio.to_thread(extract_zip, archive_path, artifact_dir)
+            try:
+                logger.info("Extracting...")
+                if archive_path.suffix == ".exe":
+                    await asyncio.to_thread(self._extract_exe, archive_path, artifact_dir)
+                elif archive_path.suffix == ".dmg":
+                    await asyncio.to_thread(self._extract_dmg, archive_path, artifact_dir)
+                elif ".tar" in archive_path.name:
+                    await asyncio.to_thread(extract_tar, archive_path, artifact_dir)
+                else:
+                    await asyncio.to_thread(extract_zip, archive_path, artifact_dir)
 
-            binary_path = self._find_binary(artifact_dir)
-            if binary_path is None:
-                raise RuntimeError(
-                    f"Firefox binary not found in extracted archive at {artifact_dir}"
-                )
+                binary_path = self._find_binary(artifact_dir)
+                if binary_path is None:
+                    raise RuntimeError(
+                        f"Firefox binary not found in extracted archive at {artifact_dir}"
+                    )
 
-            if os.name != "nt":
-                current = binary_path.stat().st_mode
-                binary_path.chmod(current | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+                if os.name != "nt":
+                    current = binary_path.stat().st_mode
+                    binary_path.chmod(current | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+            except BaseException:
+                # Leave no half-extracted directory that a later install
+                # could mistake for a complete artifact.
+                safe_rmtree(artifact_dir)
+                raise
 
             installed = InstalledArtifact(
                 name=self.name,

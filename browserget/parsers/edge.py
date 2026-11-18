@@ -102,13 +102,20 @@ def parse_versions(
             if not isinstance(artifacts, list) or not artifacts:
                 continue
 
-            artifact = artifacts[0]
-            if not isinstance(artifact, dict):
+            # Scan all artifacts: the first entry is not guaranteed to be the
+            # downloadable one (package variants share a release).
+            artifact = next(
+                (
+                    a
+                    for a in artifacts
+                    if isinstance(a, dict) and isinstance(a.get("Location"), str)
+                ),
+                None,
+            )
+            if artifact is None:
                 continue
 
-            url = artifact.get("Location")
-            if not isinstance(url, str):
-                continue
+            url = artifact["Location"]
 
             checksum: str | None = None
             checksum_algorithm: str | None = None

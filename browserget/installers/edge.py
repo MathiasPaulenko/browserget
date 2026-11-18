@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import re
+import shutil
 import stat
 import subprocess
 import sys
@@ -47,6 +49,21 @@ EDGE_API_URL = "https://edgeupdates.microsoft.com/api/products"
 
 _EDGE_SIZE_MB = 200
 _EDGEDRIVER_SIZE_MB = 10
+
+# EdgeDriver CDN versions look like "131.0.2903.86"; anything else would
+# produce a malformed or traversal-prone download URL.
+_EDGEDRIVER_VERSION_RE = re.compile(r"^\d+(?:\.\d+){1,3}$")
+
+
+def _sudo_cmd(*args: str) -> list[str]:
+    """Build a non-interactive sudo command, failing fast without sudo.
+
+    ``-n`` makes sudo fail instead of prompting for a password, which would
+    hang the CLI forever in non-interactive contexts.
+    """
+    if shutil.which("sudo") is None:
+        raise RuntimeError("sudo is required to install the Edge package")
+    return ["sudo", "-n", *args]
 
 
 class EdgeInstaller(AbstractBrowserInstaller):
@@ -232,7 +249,7 @@ class EdgeInstaller(AbstractBrowserInstaller):
             logger.info("Installing Edge package...")
             result = await asyncio.to_thread(
                 subprocess.run,
-                ["sudo", "installer", "-pkg", str(archive_path), "-target", "/"],
+                _sudo_cmd("installer", "-pkg", str(archive_path), "-target", "/"),
                 capture_output=True,
                 text=True,
                 timeout=120,
@@ -242,6 +259,8 @@ class EdgeInstaller(AbstractBrowserInstaller):
                 raise RuntimeError(f"Edge package installation failed: {result.stderr}")
 
             edge_path = Path("/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge")
+            if not edge_path.exists():
+                raise RuntimeError(f"Edge package installed but binary not found at {edge_path}")
             installed = InstalledArtifact(
                 name=self.name,
                 version=resolved.version,
@@ -309,9 +328,9 @@ class EdgeInstaller(AbstractBrowserInstaller):
 
             logger.info("Installing Edge package...")
             if is_debian:
-                cmd = ["sudo", "dpkg", "-i", str(archive_path)]
+                cmd = _sudo_cmd("dpkg", "-i", str(archive_path))
             else:
-                cmd = ["sudo", "rpm", "-i", str(archive_path)]
+                cmd = _sudo_cmd("rpm", "-i", str(archive_path))
 
             result = await asyncio.to_thread(
                 subprocess.run, cmd, capture_output=True, text=True, timeout=120, errors="replace"
@@ -320,6 +339,8 @@ class EdgeInstaller(AbstractBrowserInstaller):
                 raise RuntimeError(f"Edge package installation failed: {result.stderr}")
 
             edge_path = Path("/usr/bin/microsoft-edge")
+            if not edge_path.exists():
+                raise RuntimeError(f"Edge package installed but binary not found at {edge_path}")
             installed = InstalledArtifact(
                 name=self.name,
                 version=resolved.version,
@@ -372,6 +393,9 @@ class EdgeDriverInstaller(AbstractDriverInstaller):
                     version="latest", name="edgedriver", top_3_versions="none"
                 )
 
+        if not _EDGEDRIVER_VERSION_RE.match(version):
+            raise VersionNotFoundError(version=version, name="edgedriver", top_3_versions="none")
+
         url = build_edgedriver_url(version, platform_str)
         return ResolvedVersion(
             name="edgedriver",
@@ -398,7 +422,7 @@ class EdgeDriverInstaller(AbstractDriverInstaller):
         Raises:
             DriverMatchError: If the version is invalid.
         """
-        if not browser_version:
+        if not browser_version or not _EDGEDRIVER_VERSION_RE.match(browser_version):
             raise DriverMatchError(driver="edgedriver", browser="edge")
 
         platform = detect_platform()
@@ -461,18 +485,22 @@ class EdgeDriverInstaller(AbstractDriverInstaller):
                 safe_rmtree(artifact_dir)
             artifact_dir.mkdir(parents=True, exist_ok=True)
 
-            logger.info("Extracting...")
-            await asyncio.to_thread(extract_zip, archive_path, artifact_dir)
+            try:
+                logger.info("Extracting...")
+                await asyncio.to_thread(extract_zip, archive_path, artifact_dir)
 
-            binary_path = self._find_binary(artifact_dir)
-            if binary_path is None:
-                raise RuntimeError(
-                    f"EdgeDriver binary not found in extracted archive at {artifact_dir}"
-                )
+                binary_path = self._find_binary(artifact_dir)
+                if binary_path is None:
+                    raise RuntimeError(
+                        f"EdgeDriver binary not found in extracted archive at {artifact_dir}"
+                    )
 
-            if os.name != "nt":
-                current = binary_path.stat().st_mode
-                binary_path.chmod(current | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+                if os.name != "nt":
+                    current = binary_path.stat().st_mode
+                    binary_path.chmod(current | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+            except BaseException:
+                safe_rmtree(artifact_dir)
+                raise
 
             installed = InstalledArtifact(
                 name=self.name,

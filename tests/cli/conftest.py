@@ -93,7 +93,11 @@ def patched_installers(
         return mock_instances.get(target, MagicMock())
 
     monkeypatch.setattr(cli_module, "_create_installer", _fake_create_installer)
-    monkeypatch.setattr(cli_module, "load_config", lambda: MagicMock(cache_dir=tmp_path))
+    monkeypatch.setattr(
+        cli_module,
+        "load_config",
+        lambda: MagicMock(cache_dir=tmp_path, timeout=30, max_retries=3),
+    )
     monkeypatch.setattr(
         cli_module,
         "Registry",

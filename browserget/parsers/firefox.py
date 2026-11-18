@@ -15,9 +15,10 @@ _PLATFORM_PATHS: dict[str, str] = {
     "os": "mac",
     "linux64": "linux-x86_64",
     "linux-x86_64": "linux-x86_64",
+    "linux-i686": "linux-i686",
 }
 
-_VERSION_PATTERN = re.compile(r"^\d+(?:\.\d+)*(?:esr)?")
+_VERSION_PATTERN = re.compile(r"^\d+(?:\.\d+)*(?:esr)?$", re.IGNORECASE)
 
 
 def _firefox_version_tuple(version: str) -> tuple[int, ...]:

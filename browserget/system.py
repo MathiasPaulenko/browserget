@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
@@ -24,6 +25,13 @@ _WINDOWS_PATHS: dict[str, list[str]] = {
     ],
 }
 
+# Per-user installs live under %LOCALAPPDATA% (no admin rights required).
+_WINDOWS_LOCALAPPDATA_REL: dict[str, str] = {
+    "chrome": r"Google\Chrome\Application\chrome.exe",
+    "firefox": r"Mozilla Firefox\firefox.exe",
+    "edge": r"Microsoft\Edge\Application\msedge.exe",
+}
+
 _WINDOWS_REG_PATHS: dict[str, list[str]] = {
     "chrome": [
         r"SOFTWARE\Google\Chrome\BLBeacon",
@@ -43,9 +51,9 @@ _MACOS_PATHS: dict[str, str] = {
 }
 
 _LINUX_BINARIES: dict[str, list[str]] = {
-    "chrome": ["google-chrome", "google-chrome-stable", "chromium"],
+    "chrome": ["google-chrome", "google-chrome-stable", "chromium", "chromium-browser"],
     "firefox": ["firefox"],
-    "edge": ["microsoft-edge"],
+    "edge": ["microsoft-edge", "microsoft-edge-stable"],
 }
 
 
@@ -122,7 +130,13 @@ class SystemDetector:
         except ModuleNotFoundError:
             return None
 
-        for exe_path_str in _WINDOWS_PATHS.get(name, []):
+        exe_paths = list(_WINDOWS_PATHS.get(name, []))
+        local_app_data = os.environ.get("LOCALAPPDATA")
+        rel = _WINDOWS_LOCALAPPDATA_REL.get(name)
+        if local_app_data and rel is not None:
+            exe_paths.append(str(Path(local_app_data) / rel))
+
+        for exe_path_str in exe_paths:
             exe_path = Path(exe_path_str)
             if not exe_path.exists():
                 continue
@@ -186,7 +200,9 @@ class SystemDetector:
                         for value_name in ("version", "CurrentVersion"):
                             try:
                                 version, _ = winreg.QueryValueEx(key, value_name)  # type: ignore[attr-defined]
-                                return str(version)
+                                # Some vendors write values like
+                                # "140.0 (x64 en-US)" — extract the version.
+                                return self._parse_version_output(str(version)) or str(version)
                             except OSError:
                                 continue
                 except OSError:

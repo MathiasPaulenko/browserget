@@ -149,23 +149,27 @@ class GeckoDriverInstaller(AbstractDriverInstaller):
                 safe_rmtree(artifact_dir)
             artifact_dir.mkdir(parents=True, exist_ok=True)
 
-            logger.info("Extracting...")
-            if archive_path.suffix == ".zip":
-                await asyncio.to_thread(extract_zip, archive_path, artifact_dir)
-            elif ".tar" in archive_path.name:
-                await asyncio.to_thread(extract_tar, archive_path, artifact_dir)
-            else:
-                raise RuntimeError(f"Unsupported archive format: {archive_path.name}")
+            try:
+                logger.info("Extracting...")
+                if archive_path.suffix == ".zip":
+                    await asyncio.to_thread(extract_zip, archive_path, artifact_dir)
+                elif ".tar" in archive_path.name:
+                    await asyncio.to_thread(extract_tar, archive_path, artifact_dir)
+                else:
+                    raise RuntimeError(f"Unsupported archive format: {archive_path.name}")
 
-            binary_path = self._find_binary(artifact_dir)
-            if binary_path is None:
-                raise RuntimeError(
-                    f"GeckoDriver binary not found in extracted archive at {artifact_dir}"
-                )
+                binary_path = self._find_binary(artifact_dir)
+                if binary_path is None:
+                    raise RuntimeError(
+                        f"GeckoDriver binary not found in extracted archive at {artifact_dir}"
+                    )
 
-            if os.name != "nt":
-                current = binary_path.stat().st_mode
-                binary_path.chmod(current | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+                if os.name != "nt":
+                    current = binary_path.stat().st_mode
+                    binary_path.chmod(current | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+            except BaseException:
+                safe_rmtree(artifact_dir)
+                raise
 
             installed = InstalledArtifact(
                 name=self.name,

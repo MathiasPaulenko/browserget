@@ -172,7 +172,7 @@ def _exit_with_error(exc: Exception, json_output: bool, debug: bool) -> None:
     if debug:
         import traceback
 
-        traceback.print_exc(file=sys.stderr)
+        traceback.print_exception(type(exc), exc, exc.__traceback__, file=sys.stderr)
     raise typer.Exit(code=exit_code)
 
 
@@ -204,7 +204,6 @@ async def _install_one(
         browser_artifact = registry.find(for_browser)
         if browser_artifact is None:
             raise DriverMatchError(driver=target, browser=for_browser)
-        assert target in _DRIVER_TARGETS
         driver_installer = cast(AbstractDriverInstaller, installer)
         resolved = await driver_installer.match_browser(browser_artifact.version)
     else:
@@ -236,15 +235,29 @@ async def _ensure_one(
         A tuple of (installed artifact, whether it was newly installed).
     """
     installer = _create_installer(target, http, registry, config)
-    if for_browser and target in _DRIVER_TARGETS:
-        browser_artifact = registry.find(for_browser)
-        if browser_artifact is None:
-            raise DriverMatchError(driver=target, browser=for_browser)
-        assert target in _DRIVER_TARGETS
-        driver_installer = cast(AbstractDriverInstaller, installer)
-        resolved = await driver_installer.match_browser(browser_artifact.version)
-    else:
-        resolved = await installer.resolve(version)
+    try:
+        if for_browser and target in _DRIVER_TARGETS:
+            browser_artifact = registry.find(for_browser)
+            if browser_artifact is None:
+                raise DriverMatchError(driver=target, browser=for_browser)
+            driver_installer = cast(AbstractDriverInstaller, installer)
+            resolved = await driver_installer.match_browser(browser_artifact.version)
+        else:
+            resolved = await installer.resolve(version)
+    except NetworkError:
+        # "ensure" is idempotent: if the artifact is already installed and no
+        # reinstall was requested, a network outage must not turn into a
+        # failure — the requested end state is already satisfied.
+        existing = registry.find(target, version)
+        if existing is None and version is not None and version.isdigit():
+            # Milestone requests (e.g. "131") match any installed 131.x.
+            for entry in registry.get(target):
+                if entry.version.split(".")[0] == version:
+                    existing = entry
+                    break
+        if existing is not None and not force:
+            return (existing, False)
+        raise
 
     existing = registry.find(target, resolved.version)
     if existing is not None and not force:
@@ -397,14 +410,15 @@ async def _check_connectivity(http: HttpClient) -> list[tuple[str, bool, str]]:
         ("EdgeDriver CDN", "https://msedgedriver.microsoft.com/LATEST_STABLE"),
         ("GitHub API", "https://api.github.com/repos/mozilla/geckodriver/releases"),
     ]
-    results: list[tuple[str, bool, str]] = []
-    for name, url in urls:
+
+    async def _check(name: str, url: str) -> tuple[str, bool, str]:
         try:
             await http.get_text(url)
-            results.append((name, True, "reachable"))
+            return (name, True, "reachable")
         except Exception:
-            results.append((name, False, "unreachable"))
-    return results
+            return (name, False, "unreachable")
+
+    return list(await asyncio.gather(*[_check(name, url) for name, url in urls]))
 
 
 # ---------------------------------------------------------------------------
@@ -436,6 +450,9 @@ def install(
     for target in targets:
         if target not in _KNOWN_TARGETS:
             _exit_with_error(UnknownTargetError(target), json_output, debug)
+
+    # Duplicate targets would race on the same download path and artifact dir.
+    targets = list(dict.fromkeys(targets))
 
     if for_browser and for_browser not in _BROWSER_TARGETS:
         _exit_with_error(UnknownTargetError(for_browser), json_output, debug)
@@ -522,6 +539,9 @@ def ensure(
     for target in targets:
         if target not in _KNOWN_TARGETS:
             _exit_with_error(UnknownTargetError(target), json_output, debug)
+
+    # Duplicate targets would race on the same download path and artifact dir.
+    targets = list(dict.fromkeys(targets))
 
     if for_browser and for_browser not in _BROWSER_TARGETS:
         _exit_with_error(UnknownTargetError(for_browser), json_output, debug)
@@ -664,8 +684,27 @@ def remove(
         print(f"Error: Unknown target: {target}", file=sys.stderr)
         raise typer.Exit(code=2)
 
+    if all_versions is True and isinstance(version, str):
+        print("Error: --all and --version are mutually exclusive.", file=sys.stderr)
+        raise typer.Exit(code=2)
+
     config = load_config()
     registry = Registry(config.cache_dir)
+
+    def _remove_artifact_dir(artifact_version: str) -> None:
+        try:
+            artifact_dir = get_artifact_dir(target, artifact_version)
+        except ValueError:
+            # Corrupted registry entry: still purge it from the registry.
+            return
+        if artifact_dir.exists():
+            try:
+                safe_rmtree(artifact_dir)
+            except OSError as exc:
+                print(
+                    f"Warning: Failed to remove {artifact_dir}: {exc}",
+                    file=sys.stderr,
+                )
 
     if all_versions:
         artifacts = registry.get(target)
@@ -673,15 +712,7 @@ def remove(
             print(f"Error: {target} is not installed.", file=sys.stderr)
             raise typer.Exit(code=2)
         for a in artifacts:
-            artifact_dir = get_artifact_dir(target, a.version)
-            if artifact_dir.exists():
-                try:
-                    safe_rmtree(artifact_dir)
-                except OSError as exc:
-                    print(
-                        f"Warning: Failed to remove {artifact_dir}: {exc}",
-                        file=sys.stderr,
-                    )
+            _remove_artifact_dir(a.version)
             registry.remove(target, a.version)
         print(f"Removed all versions of {target}")
         return
@@ -691,12 +722,7 @@ def remove(
         print(f"Error: {target} is not installed.", file=sys.stderr)
         raise typer.Exit(code=2)
 
-    artifact_dir = get_artifact_dir(target, artifact.version)
-    if artifact_dir.exists():
-        try:
-            safe_rmtree(artifact_dir)
-        except OSError as exc:
-            print(f"Warning: Failed to remove {artifact_dir}: {exc}", file=sys.stderr)
+    _remove_artifact_dir(artifact.version)
     registry.remove(target, artifact.version)
     print(f"Removed {target} {artifact.version}")
 
@@ -751,12 +777,17 @@ def doctor() -> None:
     else:
         checks.append(("Cache directory", False, "does not exist"))
 
+    registry_path = cache_dir / "registry.json"
     try:
-        registry = Registry(cache_dir)
-        data = registry.load()
-        count = sum(len(v) for v in data.values())
+        if registry_path.exists():
+            raw = json.loads(registry_path.read_text(encoding="utf-8"))
+            if not isinstance(raw, dict):
+                raise ValueError("registry root is not an object")
+            count = sum(len(v) for v in raw.values() if isinstance(v, list))
+        else:
+            count = 0
         checks.append(("Registry", True, f"{count} artifacts"))
-    except (OSError, ValueError, json.JSONDecodeError):
+    except (OSError, ValueError):
         checks.append(("Registry", False, "corrupted"))
 
     try:
