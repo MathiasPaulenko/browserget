@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-11-23
+
+### Fixed
+
+- Checksum verification now normalizes the expected digest (case and
+  whitespace) and returns a mismatch instead of crashing on non-hex input;
+  Edge installs no longer fail on uppercase API hashes
+- `Retry-After` response headers are capped at 60s, so a hostile or broken
+  server can no longer stall the CLI indefinitely
+- `cleanup_downloads` and `safe_rmtree` no longer crash when the downloads
+  path or removal target is a regular file
+- `install`/`ensure` deduplicate repeated targets, which previously raced on
+  the same download path and artifact directory
+- `remove --all --version` now errors instead of silently ignoring
+  `--version`; `remove` also tolerates corrupted registry entries
+- `doctor` reports a corrupted registry file as failed instead of healthy
+- `ensure` falls back to an existing install when the network is down,
+  keeping the idempotent contract (only without `--force`)
+- Downloads reject non-HTTP(S) URL schemes and text fetches are capped at
+  64MB, preventing local-file exfiltration and unbounded memory use
+- UTF-32 encoded API responses are decoded from their BOM instead of being
+  misdetected as UTF-16
+- Firefox version detection is anchored, and requesting `Xesr` no longer
+  resolves to the non-ESR build
+- EdgeDriver rejects malformed version strings (e.g. `../`) before building
+  the CDN URL
+- Path component validation blocks Windows-invalid names (`NUL`, `COM1`,
+  `a:b`, trailing dots/spaces, control characters)
+- Zip extraction restores executable bits on helper binaries bundled inside
+  archives on POSIX systems
+- 32-bit x86 machines are detected as `x86` and map to `win32`/`linux-i686`
+  downloads instead of receiving incompatible 64-bit binaries
+- Windows system detection now also finds per-user browser installs under
+  `%LOCALAPPDATA%` and parses decorated registry versions like
+  `140.0 (x64 en-US)`; Linux detection covers `chromium-browser` and
+  `microsoft-edge-stable`
+- Edge package installs use non-interactive `sudo -n` (no more hanging on a
+  password prompt) and verify the binary actually landed before registering
+- Failed installs no longer leave half-extracted artifact directories behind
+- Registry `add`/`remove` are serialized with a file lock, preventing lost
+  updates from concurrent CLI invocations; stale temp files are cleaned up
+- `--debug` prints the real exception traceback instead of a `NoneType` line
+- `doctor` connectivity checks now run concurrently
+- `User-Agent` reports the installed package version instead of `browserget/1.0`
+- `HttpClient` validates `timeout`/`max_retries` on construction
+- The Edge parser scans all release artifacts for a downloadable URL instead
+  of only the first entry
+- `BROWSERGET_CACHE_DIR` values that are only whitespace fall back to the
+  default cache directory
+- The wheel now ships `py.typed`, matching the `Typing :: Typed` classifier
+
 ## [1.2.0] - 2026-10-16
 
 ### Added
